@@ -17,13 +17,27 @@
 
 
 
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    >
         <Button
             android:id="@+id/btn_add"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="50dp"
 
             android:text="增加"
             />
 
+    <Button
+        android:id="@+id/btn_reg"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="50dp"
+
+        android:text="注册"
+        />
+</LinearLayout>
 </LinearLayout>

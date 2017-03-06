@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btn_add;
     private List<Person> mPersons = new ArrayList<>();
     private MyAdapter mMyAdapter;
+    private Button btn_reg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,13 +48,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void applyWritePermission() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             applyPermission();
         }
     }
 
     private void applyPermission() {
-        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1001);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001);
     }
 
     private void getAllPerson() {
@@ -80,6 +81,14 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
         Bmob.initialize(this, "88550df99426c362c26d3ee1151a6bc6");
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        btn_reg = (Button) findViewById(R.id.btn_reg);
+        btn_reg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,RegisterActivity.class);
+                startActivity(intent);
+            }
+        });
         btn_add = (Button) findViewById(R.id.btn_add);
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,21 +129,20 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     int index = holder.getAdapterPosition();
-                    Intent intent = new Intent(MainActivity.this,addPerson.class);
-                    intent.putExtra("name",p.getName());
-                    intent.putExtra("age",p.getAge());
-                    intent.putExtra("address",p.getAddress());
-                    intent.putExtra("url",mImageBeen.get(index).getUrl());
-                    intent.putExtra("perId",p.getObjectId());
-                    intent.putExtra("imgId",mImageBeen.get(index).getObjectId());
+                    Intent intent = new Intent(MainActivity.this, addPerson.class);
+                    intent.putExtra("name", p.getName());
+                    intent.putExtra("age", p.getAge());
+                    intent.putExtra("address", p.getAddress());
+                    intent.putExtra("url", mImageBeen.get(index).getUrl());
+                    intent.putExtra("perId", p.getObjectId());
+                    intent.putExtra("imgId", mImageBeen.get(index).getObjectId());
                     startActivity(intent);
                 }
             });
 
 
-
             final BmobQuery<ImageBean> imageBeanBmobQuery = new BmobQuery<>();
-             imageBeanBmobQuery.findObjects(new FindListener<ImageBean>() {
+            imageBeanBmobQuery.findObjects(new FindListener<ImageBean>() {
                 @Override
                 public void done(List<ImageBean> list, BmobException e) {
                     if (e == null) {
@@ -153,7 +161,6 @@ public class MainActivity extends AppCompatActivity {
                     int index = holder.getAdapterPosition();
                     String perId = p.getObjectId();
                     String imgId = mImageBeen.get(position).getObjectId();
-
 
 
                     //删除图片
@@ -209,11 +216,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case 1001:{
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        switch (requestCode) {
+            case 1001: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "申请权限成功！！！", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     Toast.makeText(this, "申请权限失败，可能会导致应用异常！！！", Toast.LENGTH_SHORT).show();
                 }
             }
