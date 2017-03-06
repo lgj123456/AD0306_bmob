@@ -1,7 +1,12 @@
 package com.example.yhdj.ad0306bmob;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,7 +41,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
+        //申请权限
+        applyWritePermission();
         getAllPerson();
+    }
+
+    private void applyWritePermission() {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            applyPermission();
+        }
+    }
+
+    private void applyPermission() {
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1001);
     }
 
     private void getAllPerson() {
@@ -186,7 +203,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+//申请权限回调
 
 
-
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case 1001:{
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this, "申请权限成功！！！", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(this, "申请权限失败，可能会导致应用异常！！！", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
 }
