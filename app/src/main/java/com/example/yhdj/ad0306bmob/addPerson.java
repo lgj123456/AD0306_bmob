@@ -112,7 +112,6 @@ public class addPerson extends AppCompatActivity {
                 progressDialog.setTitle("提示");
                 progressDialog.setMessage("添加中······");
                 progressDialog.setCancelable(false);
-                progressDialog.show();
                 uploadImg();
 
 
@@ -155,6 +154,7 @@ public class addPerson extends AppCompatActivity {
             Toast.makeText(this, "您还没有选择头像！！！", Toast.LENGTH_SHORT).show();
             return;
         }
+        progressDialog.show();
         final BmobFile bmobFile = new BmobFile(new File(path));
         bmobFile.upload(new UploadFileListener() {
             @Override
@@ -164,6 +164,7 @@ public class addPerson extends AppCompatActivity {
                     url = bmobFile.getFileUrl();
                     ImageBean imageBean = new ImageBean();
                     imageBean.setUrl(url);
+
                     imageBean.save(new SaveListener<String>() {
                         @Override
                         public void done(String s, BmobException e) {
