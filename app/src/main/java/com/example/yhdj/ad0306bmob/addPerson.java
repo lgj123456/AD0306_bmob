@@ -1,5 +1,6 @@
 package com.example.yhdj.ad0306bmob;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -33,36 +34,36 @@ public class addPerson extends AppCompatActivity {
     protected static final int GET_HEAD_IMG = 1001;
     private static final int CROP_HEAD = 1002;
     private Bitmap bmp;
-    private  String path;
+    private String path;
     private Uri imgUri;
     private String url;
     private Person p;
     private Button btn_update;
-    private  String perId;
+    private String perId;
     private String imgId;
-
+    private  ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_person);
 
-      initViews();
+        initViews();
         isUpdate();
     }
 
     private void isUpdate() {
         Intent intent = getIntent();
-        if(intent == null){
+        if (intent == null) {
             return;
-        }else{
+        } else {
             edt_name.setText(intent.getStringExtra("name"));
-            edt_age.setText(String.valueOf(intent.getIntExtra("age",0)));
+            edt_age.setText(String.valueOf(intent.getIntExtra("age", 0)));
             edt_adderss.setText(intent.getStringExtra("address"));
-             perId = intent.getStringExtra("perId");
-             imgId = intent.getStringExtra("imgId");
-            if(intent.getStringExtra("url") == null){
+            perId = intent.getStringExtra("perId");
+            imgId = intent.getStringExtra("imgId");
+            if (intent.getStringExtra("url") == null) {
                 headImg.setImageResource(R.mipmap.ic_launcher);
-            }else{
+            } else {
                 Glide.with(addPerson.this).load(intent.getStringExtra("url")).into(headImg);
             }
 
@@ -70,13 +71,20 @@ public class addPerson extends AppCompatActivity {
     }
 
     private void initViews() {
-         p = new Person();
+        p = new Person();
         btn_commit = (Button) findViewById(R.id.btn_commit);
         edt_name = (EditText) findViewById(R.id.edi_name);
         edt_age = (EditText) findViewById(R.id.edt_age);
         edt_adderss = (EditText) findViewById(R.id.edt_address);
         btn_update = (Button) findViewById(R.id.btn_update);
+        Intent intent = getIntent();
 
+        if(!intent.getBooleanExtra("isAdd",false)){
+            btn_update.setClickable(false);
+        }
+        if(intent.getBooleanExtra("isUpdate",false)){
+            btn_commit.setClickable(false);
+        }
         //更新
         btn_update.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,8 +99,8 @@ public class addPerson extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 getImg();
-              // 上传图片因为这里是异步的uploadImg();还没得到图片就已经 p.setPic(url);所以放到
-              //按钮的点击事件中执行，保证图片先得到，按钮点击事件执行才开始上传。
+                // 上传图片因为这里是异步的uploadImg();还没得到图片就已经 p.setPic(url);所以放到
+                //按钮的点击事件中执行，保证图片先得到，按钮点击事件执行才开始上传。
 
             }
         });
@@ -100,6 +108,11 @@ public class addPerson extends AppCompatActivity {
         btn_commit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                 progressDialog = new ProgressDialog(addPerson.this);
+                progressDialog.setTitle("提示");
+                progressDialog.setMessage("添加中······");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
                 uploadImg();
 
 
@@ -112,25 +125,25 @@ public class addPerson extends AppCompatActivity {
         getContent();
         ImageBean imageBean = new ImageBean();
         imageBean.setUrl(url);
-        imageBean.update(imgId,new UpdateListener() {
+        imageBean.update(imgId, new UpdateListener() {
             @Override
             public void done(BmobException e) {
-                if(e == null){
-                    Toast.makeText(addPerson.this, "更新成功！！！", Toast.LENGTH_SHORT).show();
+                if (e == null) {
+                    getContent();
                     p.update(perId, new UpdateListener() {
                         @Override
                         public void done(BmobException e) {
-                            if(e == null){
-                                Toast.makeText(addPerson.this, "更新成功+1！！！", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(addPerson.this,MainActivity.class);
+                            if (e == null) {
+                                Toast.makeText(addPerson.this, "更新成功！！！", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(addPerson.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
-                            }else{
+                            } else {
                                 Toast.makeText(addPerson.this, "更新失败+1！！！", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-                }else{
+                } else {
                     Toast.makeText(addPerson.this, "更新失败！！！", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -138,7 +151,7 @@ public class addPerson extends AppCompatActivity {
     }
 
     private void uploadImg() {
-        if (path == null){
+        if (path == null) {
             Toast.makeText(this, "您还没有选择头像！！！", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -146,26 +159,26 @@ public class addPerson extends AppCompatActivity {
         bmobFile.upload(new UploadFileListener() {
             @Override
             public void done(BmobException e) {
-                if(e == null){
+                if (e == null) {
                     //图片在服务器上的路径
                     url = bmobFile.getFileUrl();
-                    Toast.makeText(addPerson.this, "上传图片成功！！！" + url, Toast.LENGTH_SHORT).show();
                     ImageBean imageBean = new ImageBean();
                     imageBean.setUrl(url);
                     imageBean.save(new SaveListener<String>() {
                         @Override
                         public void done(String s, BmobException e) {
-                            if(e == null){
+                            if (e == null) {
                                 Toast.makeText(addPerson.this, "成功", Toast.LENGTH_SHORT).show();
                                 //为了解决线程问题，先让person表上传到服务器，再提交图片到服务器
                                 getContent();
+                                progressDialog.dismiss();
                                 savePerson();
-                            }else{
+                            } else {
                                 Toast.makeText(addPerson.this, "失败", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-                }else{
+                } else {
                     Toast.makeText(addPerson.this, "上传图片失败！！！", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -181,7 +194,7 @@ public class addPerson extends AppCompatActivity {
 
     private void getContent() {
         if (edt_name.getText().toString().isEmpty() || edt_age.getText().toString().isEmpty() || edt_adderss.getText().toString().isEmpty()) {
-            Toast.makeText(this, "姓名，年龄，地址不能为空！！！", Toast.LENGTH_SHORT).show();
+            Toast.makeText(addPerson.this, "姓名，年龄，地址不能为空！！！", Toast.LENGTH_SHORT).show();
             return;
         }
         String name = edt_name.getText().toString().trim();
@@ -192,8 +205,6 @@ public class addPerson extends AppCompatActivity {
         p.setAge(age);
         p.setName(name);
 
-
-
     }
 
     private void savePerson() {
@@ -203,7 +214,7 @@ public class addPerson extends AppCompatActivity {
             public void done(String s, BmobException e) {
                 if (e == null) {
                     Toast.makeText(addPerson.this, "添加成功！！！", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(addPerson.this,MainActivity.class);
+                    Intent intent = new Intent(addPerson.this, MainActivity.class);
                     startActivity(intent);
                     finish();
                 } else {
@@ -223,11 +234,11 @@ public class addPerson extends AppCompatActivity {
             }
 
             //获取图片路径
-            String proj[]  = {MediaStore.Images.Media.DATA};
-            Cursor cursor = managedQuery(imgUri,proj,null,null,null);
+            String proj[] = {MediaStore.Images.Media.DATA};
+            Cursor cursor = managedQuery(imgUri, proj, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
-             path = cursor.getString(column_index);
+            path = cursor.getString(column_index);
             Toast.makeText(this, "" + path, Toast.LENGTH_SHORT).show();
             //裁剪图片
             Intent intent = new Intent();

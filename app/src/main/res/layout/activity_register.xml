@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+
+              android:background="#33ff0000"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/edt_username"
+        android:hint="用户名"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/edt_password"
+        android:hint="密码"
+        android:inputType="textPassword"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/edt_comfirm"
+        android:hint="确认密码"
+        android:inputType="textPassword"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/edt_phone"
+        android:hint="手机号"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <EditText
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp"
+            android:id="@+id/edt_code"
+            android:hint="验证码"
+            />
+
+        <Button
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_code"
+            android:text="获取验证码"
+            android:layout_gravity="center"
+            />
+    </LinearLayout>
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_reg"
+        android:text="注册"
+        android:layout_gravity="center"
+        android:gravity="center"
+        />
+</LinearLayout>
